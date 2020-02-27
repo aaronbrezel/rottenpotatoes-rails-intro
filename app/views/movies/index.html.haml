@@ -11,9 +11,9 @@
 %table#movies.table.table-striped.col-md-12
   %thead
     %tr
-      %th{:class => ("hilite" if params[:sort] == "alphabet")}= link_to "Movie Title", movies_path(sort: "alphabet") 
+      %th{:class => ("hilite" if session[:sort] == "alphabet")}= link_to "Movie Title", movies_path(sort: "alphabet") 
       %th Rating
-      %th{:class => ("hilite" if params[:sort] == "date")}= link_to "Movie Title", movies_path(sort: "date")
+      %th{:class => ("hilite" if session[:sort] == "date")}= link_to "Movie Title", movies_path(sort: "date")
       %th More Info
   %tbody
     - @movies.each do |movie|
