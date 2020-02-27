@@ -12,16 +12,36 @@ class MoviesController < ApplicationController
 
   def index
     
+    
+
+    @all_ratings = Movie.get_ratings
+    @filter_ratings =  @all_ratings
+    
+    puts params[:ratings].class
+
+    rating_params = params[:ratings] 
+    selected_ratings = []
+    
+    if !rating_params.nil?
+      rating_params.each do |rating, value|
+        selected_ratings.push(rating)
+      end
+      
+      @filter_ratings = @filter_ratings.select {|rating| selected_ratings.include? rating}
+
+    end
+    
+    
     case params[:sort]
     when "alphabet"
       
-      @movies = Movie.order(:title) #change to something in the module
+      @movies = Movie.where(rating: @filter_ratings).order(:title) 
     when "date"
       
-      @movies = Movie.order("release_date DESC") #change to something in the module
+      @movies = Movie.where(rating: @filter_ratings).order("release_date DESC") 
     else
       
-      @movies = Movie.all
+      @movies = Movie.where(rating: @filter_ratings) #.find_by(rating: params[:ratings])
     end
 
     
