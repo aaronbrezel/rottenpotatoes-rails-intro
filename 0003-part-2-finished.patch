@@ -1,0 +1,92 @@
+From 7b10ad4cdd4c83cce0fbdf5719ac2968bc0bf1ff Mon Sep 17 00:00:00 2001
+From: Aaron Brezel <aaronbrezel@gmail.com>
+Date: Wed, 26 Feb 2020 19:23:22 -0500
+Subject: [PATCH 3/4] part 2 finished
+
+---
+ app/controllers/movies_controller.rb | 26 +++++++++++++++++++++++---
+ app/models/movie.rb                  |  8 ++++++++
+ app/views/movies/index.html.haml     |  9 ++++++++-
+ 3 files changed, 39 insertions(+), 4 deletions(-)
+
+diff --git a/app/controllers/movies_controller.rb b/app/controllers/movies_controller.rb
+index 61b0b32..eb534cc 100644
+--- a/app/controllers/movies_controller.rb
++++ b/app/controllers/movies_controller.rb
+@@ -12,16 +12,36 @@ class MoviesController < ApplicationController
+ 
+   def index
+     
++    
++
++    @all_ratings = Movie.get_ratings
++    @filter_ratings =  @all_ratings
++    
++    puts params[:ratings].class
++
++    rating_params = params[:ratings] 
++    selected_ratings = []
++    
++    if !rating_params.nil?
++      rating_params.each do |rating, value|
++        selected_ratings.push(rating)
++      end
++      
++      @filter_ratings = @filter_ratings.select {|rating| selected_ratings.include? rating}
++
++    end
++    
++    
+     case params[:sort]
+     when "alphabet"
+       
+-      @movies = Movie.order(:title) #change to something in the module
++      @movies = Movie.where(rating: @filter_ratings).order(:title) 
+     when "date"
+       
+-      @movies = Movie.order("release_date DESC") #change to something in the module
++      @movies = Movie.where(rating: @filter_ratings).order("release_date DESC") 
+     else
+       
+-      @movies = Movie.all
++      @movies = Movie.where(rating: @filter_ratings) #.find_by(rating: params[:ratings])
+     end
+ 
+     
+diff --git a/app/models/movie.rb b/app/models/movie.rb
+index 49198a7..482c892 100644
+--- a/app/models/movie.rb
++++ b/app/models/movie.rb
+@@ -1,2 +1,10 @@
+ class Movie < ActiveRecord::Base
++
++    def self.get_ratings 
++        
++        self.uniq.pluck(:rating).sort
++    end
++
++    
++
+ end
+diff --git a/app/views/movies/index.html.haml b/app/views/movies/index.html.haml
+index 385337f..6d0dae1 100644
+--- a/app/views/movies/index.html.haml
++++ b/app/views/movies/index.html.haml
+@@ -1,6 +1,13 @@
+ -#  This file is app/views/movies/index.html.haml
+ %h2 All Movies
+-=puts params
++
++= form_tag movies_path, :method => :get do
++  Include:
++  - @all_ratings.each do |rating|
++    = rating
++    = check_box_tag "ratings[#{rating}]", 1, @filter_ratings.include?(rating) 
++  = submit_tag 'Refresh'
++
+ %table#movies.table.table-striped.col-md-12
+   %thead
+     %tr
+-- 
+2.17.1
+

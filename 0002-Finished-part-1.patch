@@ -1,0 +1,86 @@
+From 07b28aad229c11929e936c42296c776ad54ad0a8 Mon Sep 17 00:00:00 2001
+From: Aaron Brezel <aaronbrezel@gmail.com>
+Date: Wed, 26 Feb 2020 15:30:11 -0500
+Subject: [PATCH 2/4] Finished part 1
+
+---
+ app/assets/stylesheets/application.css |  3 +++
+ app/controllers/movies_controller.rb   | 15 ++++++++++++++-
+ app/views/movies/index.html.haml       |  6 +++---
+ config/routes.rb                       |  3 +++
+ 4 files changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/app/assets/stylesheets/application.css b/app/assets/stylesheets/application.css
+index f9cd5b3..15854de 100644
+--- a/app/assets/stylesheets/application.css
++++ b/app/assets/stylesheets/application.css
+@@ -13,3 +13,6 @@
+  *= require_tree .
+  *= require_self
+  */
++ table#movies th.hilite {
++    background-color: yellow;
++  }
+diff --git a/app/controllers/movies_controller.rb b/app/controllers/movies_controller.rb
+index b63fe4c..61b0b32 100644
+--- a/app/controllers/movies_controller.rb
++++ b/app/controllers/movies_controller.rb
+@@ -11,7 +11,20 @@ class MoviesController < ApplicationController
+   end
+ 
+   def index
+-    @movies = Movie.all
++    
++    case params[:sort]
++    when "alphabet"
++      
++      @movies = Movie.order(:title) #change to something in the module
++    when "date"
++      
++      @movies = Movie.order("release_date DESC") #change to something in the module
++    else
++      
++      @movies = Movie.all
++    end
++
++    
+   end
+ 
+   def new
+diff --git a/app/views/movies/index.html.haml b/app/views/movies/index.html.haml
+index 4ab8ff2..385337f 100644
+--- a/app/views/movies/index.html.haml
++++ b/app/views/movies/index.html.haml
+@@ -1,12 +1,12 @@
+ -#  This file is app/views/movies/index.html.haml
+ %h2 All Movies
+-
++=puts params
+ %table#movies.table.table-striped.col-md-12
+   %thead
+     %tr
+-      %th Movie Title
++      %th{:class => ("hilite" if params[:sort] == "alphabet")}= link_to "Movie Title", movies_path(sort: "alphabet") 
+       %th Rating
+-      %th Release Date
++      %th{:class => ("hilite" if params[:sort] == "date")}= link_to "Movie Title", movies_path(sort: "date")
+       %th More Info
+   %tbody
+     - @movies.each do |movie|
+diff --git a/config/routes.rb b/config/routes.rb
+index faacdaa..b065e03 100644
+--- a/config/routes.rb
++++ b/config/routes.rb
+@@ -8,6 +8,9 @@ Rails.application.routes.draw do
+   # Example of regular route:
+   #   get 'products/:id' => 'catalog#view'
+ 
++
++
++
+   # Example of named route that can be invoked with purchase_url(id: product.id)
+   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
+ 
+-- 
+2.17.1
+
